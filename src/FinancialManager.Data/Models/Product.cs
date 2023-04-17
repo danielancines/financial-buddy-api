@@ -6,8 +6,7 @@ namespace FinancialManager.Data.Models;
 public class Product
 {
     [BsonId]
-    [BsonRepresentation(BsonType.ObjectId)]
-    public string? Id { get; set; }
+    public Guid Id { get; set; }
 
     [BsonElement("barcode")]
     public string? Barcode { get; set; }
@@ -21,10 +20,9 @@ public class Product
     [BsonElement("price")]
     public double Price { get; set; }
 
-    [BsonElement("store")]
-    public string? Store { get; set; }
-
     [BsonElement("date")]
     public DateTime Date { get; set; }
 
+    [BsonElement("prices")]
+    public List<ProductPrice> Prices { get; set; } = new List<ProductPrice>();
 }
