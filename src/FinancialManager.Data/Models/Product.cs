@@ -6,6 +6,7 @@ namespace FinancialManager.Data.Models;
 public class Product
 {
     [BsonId]
+    [BsonRepresentation(BsonType.String)]
     public Guid Id { get; set; }
 
     [BsonElement("barcode")]

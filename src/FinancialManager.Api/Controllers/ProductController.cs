@@ -1,15 +1,17 @@
 using FinancialManager.Data.Models;
 using FinancialManager.Data.Repositories;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using MongoDB.Bson;
-using MongoDB.Driver;
+using Swashbuckle.AspNetCore.Annotations;
+using System.Text.Json;
 
 namespace FinancialManager.Api.Controllers
 {
     [ApiController]
     [Authorize]
     [Route("api/v1/product")]
+    [SwaggerTag("Products RESTFull endpoint")]
     public class ProductController : ControllerBase
     {
         private ProductRepository _productRepository;
@@ -20,14 +22,21 @@ namespace FinancialManager.Api.Controllers
         }
 
         [HttpGet]
+        [SwaggerOperation(description: "Get all products")]
         public ActionResult<IList<Product>> Get()
         {
             var products = this._productRepository.Get();
             return Ok(products);
         }
 
+        [HttpGet("{id}")]
+        public ActionResult<Product> Get(Guid id)
+        {
+            return Ok(this._productRepository.Get(id));
+        }
+
         [HttpGet("{id}/prices")]
-        public async Task<ActionResult<IList<Product>>> Get(Guid id)
+        public ActionResult<IList<Product>> GetPrices(Guid id)
         {
             return Ok(this._productRepository.GetPrices(id));
         }
@@ -36,7 +45,7 @@ namespace FinancialManager.Api.Controllers
         public ActionResult Post(Product product)
         {
             var result = this._productRepository.Add(product);
-        
+
             return result ? Created($"api/v1/product/{product.Id}", product) : BadRequest();
         }
 
@@ -46,9 +55,17 @@ namespace FinancialManager.Api.Controllers
             if (productPrice.Price <= 0)
                 return BadRequest("ProductPrice with no Price is now allowed");
 
-            this._productRepository.AddPrice(id, productPrice);
+            var result = this._productRepository.AddPrice(id, productPrice);
 
-            return Ok(productPrice);
+            if (result)
+                return Ok(productPrice);
+            else
+                return NotFound(JsonSerializer.Serialize(new
+                {
+                    ProductId = id,
+                    Response = "Product not Found",
+                    Message = "Product price not included"
+                }));
         }
 
         [HttpDelete("{id}")]

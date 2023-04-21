@@ -21,6 +21,11 @@ public class ProductRepository
                select product;
     }
 
+    public Product Get(Guid id)
+    {
+        return this._productsCollection.Find(p=>p.Id.Equals(id)).FirstOrDefault();
+    }
+
     public IEnumerable<ProductPrice> GetPrices(Guid id)
     {
         var selectedProduct = this._productsCollection.Find(p => p.Id.Equals(id)).FirstOrDefault();
