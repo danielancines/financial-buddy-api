@@ -13,7 +13,7 @@ public class ProductPrice
     public string? Store { get; set; }
 
     [BsonElement("date")]
-    public DateTime Date { get; } = DateTime.Now;
+    public DateTime Date { get; set; } = DateTime.Now;
 
     [BsonElement("price")]
     public double Price { get; set; }
