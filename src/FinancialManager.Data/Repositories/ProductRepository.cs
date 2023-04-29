@@ -8,7 +8,6 @@ namespace FinancialManager.Data.Repositories;
 public class ProductRepository
 {
     private readonly IMongoCollection<Product> _productsCollection;
-    //private FinancialManagerDbContext _context;
     public ProductRepository(FinancialBuddyDatabaseSettings financialBuddyDatabaseSettings)
     {
         var mongoClient = new MongoClient(financialBuddyDatabaseSettings.ConnectionString);
@@ -18,6 +17,13 @@ public class ProductRepository
     public IEnumerable<Product> Get()
     {
         return from product in this._productsCollection.AsQueryable()
+               select product;
+    }
+
+    public IEnumerable<Product> Search(string term)
+    {
+        return from product in this._productsCollection.AsQueryable()
+               where product.Name.Contains(term) || product.Barcode.Contains(term) || product.Description.Contains(term)
                select product;
     }
 
@@ -41,13 +47,19 @@ public class ProductRepository
         return true;
     }
 
+    public async Task<bool> UpdateAsync(Product product)
+    {
+        var replaceResult = await this._productsCollection.ReplaceOneAsync(p => p.Id == product.Id, product);
+        return replaceResult.ModifiedCount > 0;
+    }
+
     public bool AddPrice(Guid id, ProductPrice productPrice)
     {
         var product = this._productsCollection.Find(p => p.Id == id).FirstOrDefault();
         if (product == null)
             return false;
 
-        productPrice.Id = ObjectId.GenerateNewId().ToString();
+        productPrice.Id = Guid.NewGuid();
 
         var filter = Builders<Product>.Filter.Eq("Id", id);
         var update = Builders<Product>.Update.AddToSet("prices", productPrice);

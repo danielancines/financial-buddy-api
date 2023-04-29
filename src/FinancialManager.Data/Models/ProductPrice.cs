@@ -6,8 +6,8 @@ namespace FinancialManager.Data.Models;
 public class ProductPrice
 {
     [BsonId]
-    [BsonRepresentation(BsonType.ObjectId)]
-    public string? Id { get; set; }
+    [BsonRepresentation(BsonType.String)]
+    public Guid Id { get; set; }
 
     [BsonElement("store")]
     public string? Store { get; set; }

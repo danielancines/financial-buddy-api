@@ -49,6 +49,14 @@ namespace FinancialManager.Api.Controllers
             return result ? Created($"api/v1/product/{product.Id}", product) : BadRequest();
         }
 
+        [HttpPut]
+        public async Task<ActionResult> Put(Product product)
+        {
+            var result = await this._productRepository.UpdateAsync(product);
+
+            return result ? Ok($"api/v1/product/{product.Id}") : BadRequest();
+        }
+
         [HttpPost("{id}/price")]
         public ActionResult Post(Guid id, ProductPrice productPrice)
         {
