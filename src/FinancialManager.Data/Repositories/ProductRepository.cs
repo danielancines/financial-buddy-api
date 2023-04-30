@@ -29,7 +29,7 @@ public class ProductRepository
 
     public Product Get(Guid id)
     {
-        return this._productsCollection.Find(p=>p.Id.Equals(id)).FirstOrDefault();
+        return this._productsCollection.Find(p => p.Id.Equals(id)).FirstOrDefault();
     }
 
     public IEnumerable<ProductPrice> GetPrices(Guid id)
@@ -43,6 +43,10 @@ public class ProductRepository
 
     public bool Add(Product product)
     {
+        if (product.Prices != null)
+            foreach (var price in product.Prices.Where(p=>p.Id == Guid.Empty))
+                price.Id = Guid.NewGuid();
+
         this._productsCollection.InsertOne(product);
         return true;
     }
