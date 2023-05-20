@@ -8,7 +8,7 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services
     .AddEndpointsApiExplorer()
-    .AddSwaggerGen(c=> c.EnableAnnotations())
+    .AddSwaggerGen(c => c.EnableAnnotations())
     .ConfigureApi(builder);
 
 var app = builder.Build();
@@ -20,8 +20,11 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
     app.UseDeveloperExceptionPage();
 }
+else
+{
+    app.UseHttpsRedirection();
+}
 
-app.UseHttpsRedirection();
 
 app.UseCors(c => c
     .AllowAnyOrigin()
