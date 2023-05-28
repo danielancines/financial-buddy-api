@@ -25,7 +25,7 @@ namespace FinancialManager.Api.Controllers
         [SwaggerOperation(description: "Get all products")]
         public ActionResult<IList<Product>> Get(string orderBy = "name")
         {
-            var products = this._productRepository.Get(orderBy);
+            var products = this._productRepository.Get();
             return Ok(products);
         }
 

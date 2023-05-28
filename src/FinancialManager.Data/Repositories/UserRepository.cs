@@ -1,5 +1,4 @@
 ﻿using FinancialManager.Data.Models;
-using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 
 namespace FinancialManager.Data.Repositories;
