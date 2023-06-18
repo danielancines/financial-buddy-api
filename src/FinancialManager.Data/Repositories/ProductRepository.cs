@@ -14,26 +14,22 @@ public class ProductRepository
         var mongoDatabase = mongoClient.GetDatabase(financialBuddyDatabaseSettings.DatabaseName);
         _productsCollection = mongoDatabase.GetCollection<Product>(financialBuddyDatabaseSettings.ProductsCollectionName);
     }
-    public IEnumerable<Product>Get(string orderBy)
+    public IEnumerable<Product> Get(string orderBy)
     {
         var mainQuery = this._productsCollection.AsQueryable();
-        IOrderedQueryable<Product>? orderByQuery = null;
-        switch (orderBy)
+        IOrderedQueryable<Product>? orderByQuery = this.GetOrderByQuery(mainQuery, orderBy);
+
+        return orderByQuery.Select(p => p);
+    }
+
+    private IOrderedQueryable<Product> GetOrderByQuery(IQueryable<Product> mainQuery, string orderBy)
+    {
+        return orderBy.ToLower() switch
         {
-            case "name":
-                orderByQuery = mainQuery.OrderBy(p=>p.Name);
-            break;
-        }
-
-        if (string.IsNullOrWhiteSpace(orderBy))
-            return this._productsCollection.AsQueryable();
-
-        if (orderByQuery != null)
-            return orderByQuery.Select(p => p);
-
-        return from product in this._productsCollection.AsQueryable()
-               orderby(product.Name)
-               select product;
+            "description" => mainQuery.OrderBy(p => p.Description),
+            "date" => mainQuery.OrderBy(p => p.Date),
+            _ => mainQuery.OrderBy(p => p.Name)
+        };
     }
 
     public IEnumerable<Product> Search(string term)
@@ -60,7 +56,7 @@ public class ProductRepository
     public bool Add(Product product)
     {
         if (product.Prices != null)
-            foreach (var price in product.Prices.Where(p=>p.Id == Guid.Empty))
+            foreach (var price in product.Prices.Where(p => p.Id == Guid.Empty))
                 price.Id = Guid.NewGuid();
 
         this._productsCollection.InsertOne(product);
