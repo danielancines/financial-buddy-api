@@ -14,9 +14,25 @@ public class ProductRepository
         var mongoDatabase = mongoClient.GetDatabase(financialBuddyDatabaseSettings.DatabaseName);
         _productsCollection = mongoDatabase.GetCollection<Product>(financialBuddyDatabaseSettings.ProductsCollectionName);
     }
-    public IEnumerable<Product> Get()
+    public IEnumerable<Product>Get(string orderBy)
     {
+        var mainQuery = this._productsCollection.AsQueryable();
+        IOrderedQueryable<Product>? orderByQuery = null;
+        switch (orderBy)
+        {
+            case "name":
+                orderByQuery = mainQuery.OrderBy(p=>p.Name);
+            break;
+        }
+
+        if (string.IsNullOrWhiteSpace(orderBy))
+            return this._productsCollection.AsQueryable();
+
+        if (orderByQuery != null)
+            return orderByQuery.Select(p => p);
+
         return from product in this._productsCollection.AsQueryable()
+               orderby(product.Name)
                select product;
     }
 
